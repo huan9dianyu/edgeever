@@ -3621,7 +3621,7 @@ const mergeMemosRecord = async (
     .map((memoId) => rows.results.find((row) => row.id === memoId))
     .filter((row): row is MemoDetailRow => Boolean(row));
   const notebookId = input.notebookId ?? ordered[0].notebook_id;
-  const title = input.title || `合并笔记 ${new Date().toLocaleDateString("zh-CN")}`;
+  const title = resolveMergedMemoTitle(input.title, ordered);
   const mergedMarkdown = ordered.map((memo) => memo.content_markdown).join("\n\n---\n\n");
   const contentJson = markdownToDoc(mergedMarkdown);
   const contentText = docToText(contentJson);
@@ -4054,6 +4054,20 @@ const slugify = (value: string) =>
 const normalizeMemoTitle = (value: string | null | undefined) => {
   const title = value?.trim();
   return title || DEFAULT_MEMO_TITLE;
+};
+
+const isCustomMemoTitle = (value: string | null | undefined) => {
+  const title = value?.trim();
+  return Boolean(title && title !== DEFAULT_MEMO_TITLE);
+};
+
+const resolveMergedMemoTitle = (inputTitle: string | undefined, sourceMemos: Array<{ title: string | null }>) => {
+  const title = inputTitle?.trim();
+  if (title) {
+    return title;
+  }
+
+  return sourceMemos.find((memo) => isCustomMemoTitle(memo.title))?.title?.trim() ?? `合并笔记 ${new Date().toLocaleDateString("zh-CN")}`;
 };
 
 const normalizeMemoListSort = (value: string | undefined): MemoListSortMode =>
