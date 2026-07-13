@@ -62,7 +62,7 @@ The automated helper commands are recommended. If you create the Cloudflare reso
 - Batch note moving, notebook drag sorting, and hierarchy editing.
 - Offline drafts and local sync queue for existing notes.
 - Single-user login with PBKDF2-SHA256 password hashing.
-- Chrome/Edge web clipper MVP: extract the current article or selected content and save it to a self-hosted EdgeEver instance.
+- Chrome/Edge web clipper MVP (pending store publication): extract the current article or selected content and save it to a self-hosted EdgeEver instance.
 
 ## PWA Installation
 

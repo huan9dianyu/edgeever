@@ -64,7 +64,7 @@ Agent 应优先按 [AI Agent Cloudflare Deployment](docs/agent-deploy-cloudflare
 - 多选移动笔记，笔记本支持拖拽排序和调整层级。
 - 已有笔记支持离线编辑草稿和本地同步队列。
 - 单用户登录，密码使用 PBKDF2-SHA256 hash。
-- 支持 Chrome/Edge 网页裁剪 MVP：提取当前网页正文或选中内容，保存到用户自己的 EdgeEver 实例。
+- 支持 Chrome/Edge 网页裁剪 MVP（待上架）：提取当前网页正文或选中内容，保存到用户自己的 EdgeEver 实例。
 
 ## PWA 安装说明
 
