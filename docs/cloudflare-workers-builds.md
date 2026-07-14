@@ -35,6 +35,14 @@ The setup API call requires a **User API Token**, not an **Account API Token**. 
 
 This token is used only by `bun run deploy:builds:setup` and is never uploaded to the Worker or Cloudflare Builds. You may instead reuse `CLOUDFLARE_API_TOKEN` only if it is a User API Token with the same permissions.
 
+## Monorepo Build Isolation
+
+The Worker trigger already ignores changes limited to `apps/site/*`, `apps/mobile/*`, `apps/extension/*`, `docs/*`, README files, and `.github/*`. Thus a website-only change does not deploy the EdgeEver Worker.
+
+For a Git-integrated Cloudflare Pages project, set `EDGE_EVER_PAGES_PROJECT_NAME` and rerun `bun run deploy:builds:setup`. The command configures Pages Build watch paths to `apps/site/*`, `bun.lock`, and `package.json`, so product-only changes do not rebuild the website. This optional step requires the User API Token to additionally have **Account** -> **Cloudflare Pages** -> **Edit**. Without automation, set the same paths in **Pages project** -> **Settings** -> **Build** -> **Build watch paths**.
+
+Cloudflare cannot set Build watch paths on a **Direct Upload** Pages project. In that case, keep the filter in the deploy workflow instead. This repository's `.github/workflows/deploy-site.yml` already runs only for website/docs/shared-build-input changes, so application-only changes do not deploy the official site.
+
 ### Manual fallback
 
 If the command cannot be used, configure the Worker in the Cloudflare dashboard:
