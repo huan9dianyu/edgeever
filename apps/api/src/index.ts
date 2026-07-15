@@ -47,11 +47,13 @@ import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import openApiSpec from "../../../docs/openapi.json";
+import { hasBootstrapCredential, verifyBootstrapPassword } from "./auth-bootstrap";
 
 type Bindings = {
   DB: D1Database;
   RESOURCES: R2Bucket;
   EDGE_EVER_AUTH_USERNAME?: string;
+  EDGE_EVER_AUTH_PASSWORD?: string;
   EDGE_EVER_AUTH_PASSWORD_HASH?: string;
   EDGE_EVER_SESSION_TTL_DAYS?: string;
   EDGE_EVER_R2_BUCKET_NAME?: string;
@@ -3138,7 +3140,7 @@ const escapeMarkdownImageAlt = (value: string) => value.replace(/[\\[\]]/g, "\\$
 const escapeMarkdownLinkLabel = (value: string) => value.replace(/[\\[\]]/g, "\\$&");
 
 const isAuthRequired = async (env: Bindings) => {
-  if (env.EDGE_EVER_AUTH_PASSWORD_HASH?.trim()) {
+  if (hasBootstrapCredential(env.EDGE_EVER_AUTH_PASSWORD, env.EDGE_EVER_AUTH_PASSWORD_HASH)) {
     return true;
   }
 
@@ -3155,14 +3157,26 @@ const verifyLogin = async (env: Bindings, username: string, password: string): P
   }
 
   const configuredHash = env.EDGE_EVER_AUTH_PASSWORD_HASH?.trim();
+  const configuredPassword = env.EDGE_EVER_AUTH_PASSWORD;
 
-  if (!configuredHash) {
+  if (!configuredHash && !configuredPassword) {
     return null;
   }
 
   const configuredUsername = env.EDGE_EVER_AUTH_USERNAME?.trim() || "admin";
 
-  if (normalizedUsername !== configuredUsername || !(await verifyPassword(password, configuredHash))) {
+  if (normalizedUsername !== configuredUsername) {
+    return null;
+  }
+
+  const passwordMatches = await verifyBootstrapPassword(
+    password,
+    configuredPassword,
+    configuredHash,
+    verifyPassword,
+  );
+
+  if (!passwordMatches) {
     return null;
   }
 
